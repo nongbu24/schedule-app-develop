@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +21,8 @@ public class UserService {
     public UserCreateResponse saveUser(UserCreateRequest request) {
         User user = new User(
                 request.getName(),
-                request.getEmail()
+                request.getEmail(),
+                request.getPassword()
         );
 
         User savedUser = userRepository.save(user);
@@ -72,9 +74,7 @@ public class UserService {
     // 수정
     @Transactional
     public UserUpdateResponse updateUser(Long id, UserUpdateRequest request) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 유저입니다.")
-        );
+        User user = validateUser(id, request.getPassword());
 
         user.update(request.getName());
 
@@ -89,12 +89,22 @@ public class UserService {
 
     // 삭제
     @Transactional
-    public void deleteUser(Long id) {
-        boolean existence = userRepository.existsById(id);
-        if (!existence) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
+    public void deleteUser(Long id, String password) {
+        User user = validateUser(id, password);
+
+        userRepository.delete(user);
+    }
+
+    // id, 비밀번호 검증 메서드
+    private User validateUser(Long id, String password) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 유저입니다.")
+        );
+
+        if (!Objects.equals(user.getPassword(), password)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        userRepository.deleteById(id);
+        return user;
     }
 }

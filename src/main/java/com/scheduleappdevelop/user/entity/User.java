@@ -2,6 +2,7 @@ package com.scheduleappdevelop.user.entity;
 
 import com.scheduleappdevelop.schedule.entity.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,9 +19,13 @@ public class User extends BaseEntity {
     private String name;
     private String email;
 
-    public User(String name, String email) {
+    @Size(min = 8, message = "비밀번호는 8자 이상이어야 합니다.")
+    private String password;
+
+    public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
+        this.password = password;
     }
 
     public void update(String name) {
