@@ -62,12 +62,12 @@
 | 항목      | 내용                                                                                                                                                         |
 |---------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **URL** | `POST /users`                                                                                                                                              |
-| **Request Body** | `name` (String, 필수) <br> `email` (String, 필수)                                                                                                              |
-| **Request Body (JSON)** | { <br> "name": "닉네임", <br> "email": "ex@ample.com" <br> }                                                                                                  |
+| **Request Body** | `name` (String, 필수) <br> `email` (String, 필수) <br> `password` (String, 필수, 8자 이상)                                                                          |
+| **Request Body (JSON)** | { <br> "name": "닉네임", <br> "email": "ex@ample.com", <br> "password": "12345678" <br> }                                                                     |
 | **Response** | `201 Created`                                                                                                                                              |
-| **Response Body** | `id`, `name`, `email`, `createdAt`, `modifiedAt` |
+| **Response Body** | `id`, `name`, `email`, `createdAt`, `modifiedAt`                                                                                                           |
 | **Response Body (JSON)** | { <br> "id": 1, <br> "name": "닉네임", <br> "email": "ex@ample.com", <br> "createdAt": "2026-04-20T12:00:00", <br> "modifiedAt": "2026-04-20T12:00:00" <br> } |
-| **Error** | `400 Bad Request` - 필수값 누락                                                                                                                                 |
+| **Error** | `400 Bad Request` - 필수값 누락 <br>`500 Internal Server Error` - 비밀번호 8자 미만 설정                                                                                 |
 
 ### 2-2. 유저 전체 조회
 
@@ -87,20 +87,21 @@
 | **Response** | `200 OK` |
 | **Response Body** | 유저 목록 배열 |
 | **Response Body (JSON)** | { <br> "id": 1, <br> "name", "닉네임", <br> "email": "ex@ample.com", <br> "createdAt": "2026-04-20T12:00:00", <br> "modifiedAt": "2026-04-20T12:00:00" <br> } |
+| **Error** | `500 Internal Server Error` - 없는 id 조회 |
 
 ### 2-4. 유저 수정
 
-| 항목                      | 내용                                                                                             |
-|-------------------------|------------------------------------------------------------------------------------------------|
-| **URL**                 | `PUT /users/{userId}`                                                                          |
-| **Path Variable**       | `userId` (Long, 필수)                                                                            |
-| **Request Body**        | `name` (String, 필수)                                                                            |
-| **Request Body (JSON)** | { <br> "name": "변경된 닉네임", <br> }                                                               |
-| **Response**            | `200 OK`                                                                                       |
-| **Response Body**       | 수정된 유저 정보 (`id`, `name`, `email`, `createdAt`, `modifiedAt`)                                   |
+| 항목                      | 내용                                                                                                                                                             |
+|-------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **URL**                 | `PUT /users/{userId}`                                                                                                                                          |
+| **Path Variable**       | `userId` (Long, 필수)                                                                                                                                            |
+| **Request Body**        | `name` (String, 필수), <br> `password` (String, 필수)                                                                                                              |
+| **Request Body (JSON)** | { <br> "name": "변경된 닉네임", <br> "password": "12345678" <br> }                                                                                                   |
+| **Response**            | `200 OK`                                                                                                                                                       |
+| **Response Body**       | 수정된 유저 정보 (`id`, `name`, `email`, `createdAt`, `modifiedAt`)                                                                                                   |
 | **Request Body (JSON)** | { <br> "id": 1, <br> "name": "변경된 닉네임", <br> "email": "ex@ample.com", <br> "createdAt": "2026-04-20T12:00:00", <br> "modifiedAt": "2026-04-20T12:50:00" <br> } 
-| **Error** | `400 Bad Request` - 필수값 누락                                                                     |
-| 비고 | 유저 이름만 수정 가능                                                                                   |
+| **Error** | `400 Bad Request` - 필수값 누락 <br> `500 Internal Server Error` - 비밀번호 일치하지 않음                                                                                     |
+| 비고 | 유저 이름만 수정 가능                                                                                                                                                   |
 
 ### 2-5. 유저 삭제
 
@@ -109,3 +110,4 @@
 | **URL** | `DELETE /users/{userId}` |
 | **Path Variable** | `userId` (Long, 필수) |
 | **Response** | `204 NO_CONTENT` |
+| **Error** | `400 Bad Request` - userId로 조회되지 않음, 비밀번호 누락 <br> `500 Internal Server Error` - 비밀번호 일치하지 않음
