@@ -1,6 +1,5 @@
 package com.scheduleappdevelop.schedule.dto;
 
-import com.scheduleappdevelop.user.entity.User;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -8,13 +7,13 @@ import java.time.LocalDateTime;
 @Getter
 public class ScheduleCreateResponse {
     private final Long id;
-    private final User user;
+    private final String user;
     private final String title;
     private final String content;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
-    public ScheduleCreateResponse(Long id, User user, String title, String content, LocalDateTime createdAt, LocalDateTime modifiedAt) {
+    public ScheduleCreateResponse(Long id, String user, String title, String content, LocalDateTime createdAt, LocalDateTime modifiedAt) {
         this.id = id;
         this.user = user;
         this.title = title;

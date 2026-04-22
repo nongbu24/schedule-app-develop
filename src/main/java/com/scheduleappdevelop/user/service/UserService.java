@@ -7,18 +7,35 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
 
+    // 로그인
+    @Transactional(readOnly = true)
+    public User login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+                () -> new RuntimeException("해당 이메일을 가진 사용자가 없습니다.")
+        );
+
+        if (!user.getPassword().equals(request.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+
+        return user;
+    }
+
+    // CRUD
     // 생성
     @Transactional
-    public UserCreateResponse saveUser(UserCreateRequest request) {
+    public UserCreateResponse signup(UserCreateRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        }
+
         User user = new User(
                 request.getName(),
                 request.getEmail(),
@@ -38,26 +55,25 @@ public class UserService {
 
     // 전체 조회
     @Transactional(readOnly = true)
-    public List<UserGetResponse> findAll() {
+    public UserListResponse findAll() {
         List<User> users = userRepository.findAll();
-        List<UserGetResponse> dtos = new ArrayList<>();
 
-        for (User user : users) {
-            dtos.add(new UserGetResponse(
-                    user.getId(),
-                    user.getName(),
-                    user.getEmail(),
-                    user.getCreatedAt(),
-                    user.getModifiedAt()
-            ));
-        }
+        List<UserListResponse.User> userList = users.stream()
+                .map(user -> new UserListResponse.User(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getCreatedAt(),
+                        user.getModifiedAt()
+                ))
+                .toList();
 
-        return dtos;
+        return new UserListResponse(userList);
     }
 
     // 단 건 조회
     @Transactional(readOnly = true)
-    public UserGetResponse findUser(Long id) {
+    public UserGetResponse findOne(Long id) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 유저입니다.")
         );
@@ -73,8 +89,10 @@ public class UserService {
 
     // 수정
     @Transactional
-    public UserUpdateResponse updateUser(Long id, UserUpdateRequest request) {
-        User user = validateUser(id, request.getPassword());
+    public UserUpdateResponse updateName(Long id, UserUpdateRequest request) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 유저입니다.")
+        );
 
         user.update(request.getName());
 
@@ -89,22 +107,11 @@ public class UserService {
 
     // 삭제
     @Transactional
-    public void deleteUser(Long id, String password) {
-        User user = validateUser(id, password);
-
-        userRepository.delete(user);
-    }
-
-    // id, 비밀번호 검증 메서드
-    private User validateUser(Long id, String password) {
+    public void delete(Long id) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 유저입니다.")
         );
 
-        if (!Objects.equals(user.getPassword(), password)) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
-
-        return user;
+        userRepository.delete(user);
     }
 }
