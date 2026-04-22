@@ -18,11 +18,11 @@ public class UserService {
     @Transactional(readOnly = true)
     public User login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
-                () -> new RuntimeException("해당 이메일을 가진 사용자가 없습니다.")
+                () -> new IllegalArgumentException("해당 이메일을 가진 사용자가 없습니다.")
         );
 
         if (!user.getPassword().equals(request.getPassword())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         return user;
