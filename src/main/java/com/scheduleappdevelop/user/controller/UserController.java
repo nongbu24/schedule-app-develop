@@ -57,12 +57,10 @@ public class UserController {
     }
 
     // 수정
-    // putMapping에서 PatchMapping으로 수정
-    // sessionAttribute에서 id를 가져올 것이므로 경로 삭제
     @PatchMapping
     public ResponseEntity<UserUpdateResponse> updateName(
             @SessionAttribute(name = "loginUser", required = false) User user,
-            @RequestBody UserUpdateRequest request
+            @Valid @RequestBody UserUpdateRequest request
     ) {
         if (user == null) {
             throw new IllegalArgumentException("로그인이 필요합니다.");

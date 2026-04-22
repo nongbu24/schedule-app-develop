@@ -3,6 +3,7 @@ package com.scheduleappdevelop.schedule.controller;
 import com.scheduleappdevelop.schedule.dto.*;
 import com.scheduleappdevelop.schedule.service.ScheduleService;
 import com.scheduleappdevelop.user.entity.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class ScheduleController {
     @PostMapping
     public ResponseEntity<ScheduleCreateResponse> create(
             @SessionAttribute(name = "loginUser", required = false) User user,
-            @RequestBody ScheduleCreateRequest request
+            @Valid @RequestBody ScheduleCreateRequest request
     ) {
         validateLogin(user);
 
@@ -55,7 +56,7 @@ public class ScheduleController {
     public ResponseEntity<ScheduleUpdateResponse> updateSchedule(
             @SessionAttribute(name = "loginUser", required = false) User user,
             @PathVariable Long id,
-            @RequestBody ScheduleUpdateRequest request
+            @Valid @RequestBody ScheduleUpdateRequest request
     ) {
         validateLogin(user);
 

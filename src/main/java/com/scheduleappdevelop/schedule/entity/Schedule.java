@@ -1,7 +1,10 @@
 package com.scheduleappdevelop.schedule.entity;
 
+import com.scheduleappdevelop.common.entity.BaseEntity;
 import com.scheduleappdevelop.user.entity.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +22,10 @@ public class Schedule extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @NotBlank(message = "제목은 비워둘 수 없습니다.")
+    @Size (max = 20, message = "제목은 20자를 넘을 수 없습니다.")
     private String title;
+
     private String content;
 
     public Schedule(User user, String title, String content) {
